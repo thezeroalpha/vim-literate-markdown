@@ -169,6 +169,7 @@ function! s:ClearResult(outputline)
   else
     execute a:outputline.','.resultend.'delete _'
   endif
+  call cursor(rowsave, colsave)
 endfunction
 
 function! literate_markdown#ExecPreviousBlock()
