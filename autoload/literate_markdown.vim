@@ -20,7 +20,7 @@ function! s:GetFilename()
     echoerr 'No :Tangle directive found'
     return ''
   else
-    let fname = getline(1)->matchstr(':Tangle \zs.*\ze -->')
+    let fname = getline(ln)->matchstr(':Tangle \zs.*\ze -->')
     if fname ==# ''
       echoerr 'No filename set.'
     else
