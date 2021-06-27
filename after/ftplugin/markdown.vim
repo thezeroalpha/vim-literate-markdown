@@ -1,3 +1,7 @@
+if exists('g:loaded_literate_markdown')
+  finish
+endif
+
 command -buffer -bar Tangle call literate_markdown#Tangle()
 command -buffer -bar ExecPrevBlock call literate_markdown#ExecPreviousBlock()
 nnoremap <buffer> <Plug>LitMdExecPrevBlock :<c-u>ExecPrevBlock<CR>
