@@ -1,6 +1,6 @@
 # vim-literate-markdown
 
-[![Play the demo](demo-thumbnail.jpg)](demo.mp4)
+![Demo gif](demo.gif)
 
 ## What?
 
