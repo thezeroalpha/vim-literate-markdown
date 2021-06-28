@@ -1,4 +1,7 @@
 # vim-literate-markdown
+
+[![Play the demo](demo-thumbnail.jpg)](demo.mp4)
+
 ## What?
 
 This is a Vim plugin that attempts to replicate a subset of the features of Emacs' Org mode code handling.
