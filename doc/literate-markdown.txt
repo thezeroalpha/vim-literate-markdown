@@ -1,0 +1,198 @@
+*literate-markdown.txt*     A plugin for literate programming in Markdown.
+
+Author:  Alexander Balgavy <https://alex.balgavy.eu/>
+License: Same terms as Vim itself (see |license|)
+
+INTRODUCTION                                               *literate-markdown*
+
+Literate programming is the interleaving of code with explanation in natural
+language, with the ability of generating just the executable code from the
+file. People often know it from Org mode in Emacs; this plugin aims to bring
+similar functionality to Markdown files in Vim. It will let you execute blocks
+of code (delimited by three backticks in Markdown) and extract these blocks of
+code into separate files through tangling.
+
+
+COMMANDS                                          *literate-markdown-commands*
+
+This plugin introduces a |ftplugin| file for the Markdown filetype, loaded
+after the default files, which adds two commands:
+
+:Tangle                 Extract code blocks according to
+                        |literate-markdown-tangle| directives
+:ExecPrevBlock          Execute the previous code block (see
+                        |literate-markdown-exec|)
+
+MAPS                                                  *literate-markdown-maps*
+
+This plugin introduces a |ftplugin| file for the Markdown filetype, loaded
+after the default files, which adds two normal mode |<Plug>| mappings:
+
+<Plug>LitMdTangle           Extract code blocks according to
+                            |literate-markdown-tangle| directives
+<Plug>LitMdExecPrevBlock    Execute the previous code block (see
+                            |literate-markdown-exec|)
+
+These mappings can be mapped to in e.g. after/ftplugin/markdown.vim in your
+.vim directory (see |after-directory|): >
+
+  nmap <buffer> <leader>ce <Plug>LitMdExecPrevBlock
+  nmap <buffer> <leader>ct <Plug>LitMdTangle
+<
+
+CODE TANGLING         *<Plug>LitMdTangle* *:Tangle* *literate-markdown-tangle*
+Tangling is the extraction of source code from the Markdown file into separate
+code files.
+
+Code tangling is done using the |:Tangle| command, or using the mapping. It
+proceeds according to directives, specified in the Markdown file itself, as
+comments.
+
+A directive takes the general form: >
+  <!-- :Tangle(language) /path/to/output/file.ext -->
+<
+
+The language is optional; you can use a generic directive: >
+  <!-- :Tangle /path/to/output/file.ext -->
+<
+
+If the language is specified, only blocks whose language matches the specified
+language will be tangled to the file. If it is not specified, all code blocks
+with a language will be tangled to the file. A tangle directive for a language
+overrides all previous directives for that language for the remainder of the
+file. A directive with no language specified overrides all previous directives
+for the remainder of the file.
+
+Examples~
+
+Below are some examples of Markdown code block tangling, followed by
+explanations.
+
+>
+  <!-- :Tangle(ruby) /tmp/output.rb -->
+
+  ```ruby
+  puts "Sample text"
+  ```
+
+  ```bash
+  echo "Sample text"
+  ```
+
+  <!-- :Tangle(ruby) /tmp/another.rb -->
+  ```ruby
+  puts "Another file"
+  ```
+<
+
+The first Ruby code block is affected by the first tangle directive, so it
+will be tangled to /tmp/output.rb. There is no generic directive, so the Bash
+code block will not be tangled. The second tangle directive for Ruby overrides
+the first, so the second Ruby code block will be tangled to /tmp/another.rb
+(and so would any subsequent Ruby code blocks).
+
+>
+  <!-- :Tangle /tmp/generic-file -->
+  <!-- :Tangle(python) /tmp/python.py -->
+
+  ```ruby
+  puts "Sample text"
+  ```
+
+  ```python
+  print("Sample text")
+  ```
+
+  ```
+  this is some pseudocode in a block with no language
+  ```
+
+  ```bash
+  echo "Sample text"
+  ```
+<
+
+The first Ruby code block is affected by the first (generic) tangle directive,
+so it will be tangled to /tmp/generic-file. The Python code block is affected
+by the second Python-specific directive, so it will be tangled to
+/tmp/python.py. The third code block does not have a language specified, so it
+will not be tangled. The fourth (Bash) code block is affected by the first
+(generic) tangle directive, so it will be tangled to /tmp/generic-file.
+
+CODE EXECUTION                       *:ExecPrevBlock* *literate-markdown-exec*
+                                                    *<Plug>LitMdExecPrevBlock*
+
+This plugin allows stateless code execution. The standard output from the
+block will be printed in the current buffer. State is NOT preserved between
+code blocks.
+
+The command |:ExecPrevBlock| or the mapping |<Plug>LitMdExecPrevBlock| look
+for the most recent code block with a specified language, which is either the
+block containing the cursor, or the first code block encountered when
+searching backwards from the cursor.
+
+The block is executed using a command looked up using a predefined dictionary,
+mapping a command to a |list| of Markdown block language names. It can be
+extended by adding entries to b:literate_markdown_interpreters or
+g:literate_markdown_interpreters, which are looked up in that order (with a
+fallback to the predefined dictionary).
+
+The defaults are: >
+
+  { 'python3': ['py', 'python', 'python3'],
+  \ 'python2': ['python2'],
+  \ 'ruby': ['rb', 'ruby'],
+  \ 'sh': ['sh'],
+  \ 'bash': ['bash']
+  \ }
+<
+
+This means that in the code blocks >
+
+  ```python
+  print("Sample text")
+  ```
+
+  ```sh
+  echo "Sample text"
+  ```
+<
+
+the first block will be executed with the python3 command, and the second code
+block will be executed with the sh command.
+
+Blocks are executed by sending them on standard input to the command. The
+command resolves to its path in your shell environment.
+
+The output will be shown beneath the code block, in the form: >
+
+  <!--
+  RESULT:
+  {output}
+  -->
+<
+{output} will be replaced with the output of the block.
+
+CONFIGURATION                                       *literate-markdown-config*
+
+You can specify commands for languages via b:literate_markdown_interpreters or
+g:literate_markdown_interpreters, as explained in |literate-markdown-exec|.
+
+You can skip loading the plugin by setting g:loaded_literate_markdown, and you
+can skip loading autoload functions by setting
+g:loaded_literate_markdown_autoload.
+
+You can remap the <Plug> mappings as explained in |literate-markdown-maps|.
+
+DISCLAIMER
+
+This plugin has not been tested on Windows, so the behavior of some functions
+(e.g. code block execution) may be different or may not work properly.
+
+ABOUT                                                *literate-markdown-about*
+
+Get the latest version or report a bug on GitHub:
+
+https://github.com/thezeroalpha/vim-literate-markdown
+
+ vim:tw=78:et:ft=help:norl:
