@@ -6,11 +6,14 @@ License: Same terms as Vim itself (see |license|)
 INTRODUCTION                                               *literate-markdown*
 
 Literate programming is the interleaving of code with explanation in natural
-language, with the ability of generating just the executable code from the
-file. People often know it from Org mode in Emacs; this plugin aims to bring
-similar functionality to Markdown files in Vim. It will let you execute blocks
-of code (delimited by three backticks in Markdown) and extract these blocks of
-code into separate files through tangling.
+language, in any order, with the ability of generating just the executable
+code from the file. People often know it from Org mode in Emacs; this plugin
+aims to bring similar functionality to Markdown files in Vim. It will let you
+execute blocks of code (delimited by three backticks in Markdown) and extract
+these blocks of code into separate files through tangling. With macros, you
+can document your code without needing to care about the order in which
+information is presented -- the tangler will extract code in the correct
+order.
 
 
 COMMANDS                                          *literate-markdown-commands*
@@ -62,6 +65,38 @@ with a language will be tangled to the file. A tangle directive for a language
 overrides all previous directives for that language for the remainder of the
 file. A directive with no language specified overrides all previous directives
 for the remainder of the file.
+
+You can use macros. A macro is limited to the specified file and language, it
+is not accessible from other files/languages. To specify that macros should be
+expanded within a block, put "<>" in the block's tangle directive: >
+  <!-- :Tangle(language) <> /path/to/output/file.ext -->
+<
+
+
+Any files that use macros should have a top-level block (i.e. one that is not
+contained in any other macro); this block should have "<^>" in its tangle
+directive: >
+  <!-- :Tangle(language) <^> /path/to/output/file.ext -->
+<
+
+A macro in a code block has to be on its own line (preceded only by
+whitespace), and is written in double angle brackets: >
+  <<this is a macro>>
+<
+
+A code block that defines the macro includes this macro in its tangle
+directive, in single angle brackets: >
+  <!-- :Tangle(language) <this is a macro> /path/to/output/file.ext -->
+<
+
+The closing angle bracket in the macro name can optionally be followed by a
+plus sign, which appends the contents of the block the the existing definition
+of the macro: >
+  <!-- :Tangle(language) <this is a macro>+ /path/to/output/file.ext -->
+<
+
+Please see the examples below, and the examples directory in the root of this
+repository, for more explanation of usage.
 
 Examples~
 
@@ -118,6 +153,60 @@ by the second Python-specific directive, so it will be tangled to
 /tmp/python.py. The third code block does not have a language specified, so it
 will not be tangled. The fourth (Bash) code block is affected by the first
 (generic) tangle directive, so it will be tangled to /tmp/generic-file.
+
+
+>
+  <!-- :Tangle(python) <^> /tmp/python.py -->
+  ```python
+  <<function definitions>>
+
+  def main():
+      <<main code>>
+
+  if __name__ == '__main__':
+      main()
+  ```
+
+  <!-- :Tangle(python) <function definitions> -->
+  ```python
+  def double(n):
+      x = 2*n
+      return x
+  ```
+
+  <!-- :Tangle(python) <> <main code> -->
+  ```python
+  <<n definition>>
+  print("Double of %d is %d" % (n, double(n)))
+  ```
+
+  <!-- :Tangle(python) <n definition> -->
+  ```python
+  n = 34.5
+  ```
+<
+
+The first Python block defines the overall structure, so it's the top level
+macro block (indicated by "<^>" in its tangle directive). It makes use of two
+macros, "function definitions" and "main code". The second block defines the
+"function definitions" macro; it does not contain any more macros, so it does
+not have "<>" in its tangle directive. The third block defines the "main code"
+macro, and contains another macro to be expanded ("n definition"), so it has
+"<>" in its tangle directive. The final block defines the "n definition" macro
+and does not contain any other macros. The resulting code will be >
+  def double(n):
+      x = 2*n
+      return x
+
+  def main():
+      n = 34.5
+      print("Double of %d is %d" % (n, double(n)))
+
+  if __name__ == '__main__':
+      main()
+<
+
+
 
 CODE EXECUTION                       *:ExecPrevBlock* *literate-markdown-exec*
                                                     *<Plug>LitMdExecPrevBlock*
