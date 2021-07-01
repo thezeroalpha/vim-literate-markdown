@@ -8,6 +8,10 @@ It generates three files:
 
 This is clearly over-engineered; it aims to only be an example of the power of literate programming.
 
+If you want to generate the code, make sure you have the `vim-literate-markdown` plugin loaded in Vim.
+Then, open this document in Vim, and run the command `:Tangle`.
+The three files described above will be in the same directory as this file.
+
 ## The main file
 The main file is pretty simple:
 
