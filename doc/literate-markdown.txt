@@ -94,7 +94,10 @@ plus sign, which appends the contents of the block the the existing definition
 of the macro: >
   <!-- :Tangle(language) <this is a macro>+ /path/to/output/file.ext -->
 <
+The full format of a tangle directive, with optional parts in brackets, is: >
 
+  <!-- :Tangle[(language)] [<^>|<>] [<macro name>[+]] [/path/to/output/file.ext] -->
+<
 Please see the examples below, and the examples directory in the root of this
 repository, for more explanation of usage.
 
