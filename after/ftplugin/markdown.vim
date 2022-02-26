@@ -2,7 +2,6 @@
 if exists('g:loaded_literate_markdown')
   finish
 endif
-let g:loaded_literate_markdown = 1
 
 
 command -buffer -bar Tangle call literate_markdown#Tangle()

@@ -16,13 +16,13 @@ The general structure of the file is:
 
 The load guard lets the user disable the autoloaded functions by setting the variable `g:loaded_literate_markdown`.
 If it's set, the entire file is skipped.
+I don't want to set it here, because otherwise it will only run once, and I want it to run every time a markdown file is loaded.
 
 <!-- :Tangle(vim) <load guard> -->
 ```vim
 if exists('g:loaded_literate_markdown')
   finish
 endif
-let g:loaded_literate_markdown = 1
 ```
 
 ## Commands
