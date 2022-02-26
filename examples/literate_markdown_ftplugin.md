@@ -14,7 +14,7 @@ The general structure of the file is:
 <<b:undo_ftplugin>>
 ```
 
-The load guard lets the user disable the autoloaded functions by setting the variable `g:loaded_literate_markdown_autoload`.
+The load guard lets the user disable the autoloaded functions by setting the variable `g:loaded_literate_markdown`.
 If it's set, the entire file is skipped.
 
 <!-- :Tangle(vim) <load guard> -->
