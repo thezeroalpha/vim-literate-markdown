@@ -8,12 +8,12 @@ INTRODUCTION                                               *literate-markdown*
 Literate programming is the interleaving of code with explanation in natural
 language, in any order, with the ability of generating just the executable
 code from the file. People often know it from Org mode in Emacs; this plugin
-aims to bring similar functionality to Markdown files in Vim. It will let you
-execute blocks of code (delimited by three backticks in Markdown) and extract
-these blocks of code into separate files through tangling. With macros, you
-can document your code without needing to care about the order in which
-information is presented -- the tangler will extract code in the correct
-order.
+aims to bring similar (but not identical!) functionality to Markdown files in
+Vim. It will let you execute blocks of code (delimited by three backticks in
+Markdown) and extract these blocks of code into separate files through
+tangling. With macros, you can document your code without needing to care
+about the order in which information is presented -- the tangler will extract
+code in the correct order.
 
 
 COMMANDS                                          *literate-markdown-commands*
@@ -272,6 +272,11 @@ can skip loading autoload functions by setting
 g:loaded_literate_markdown_autoload.
 
 You can remap the <Plug> mappings as explained in |literate-markdown-maps|.
+
+To disable automatically opening tangled files, set
+g:literate_markdown_no_open_tangled_files.
+
+To echo some debug information, set g:literate_markdown_debug.
 
 DISCLAIMER
 

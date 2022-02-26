@@ -19,7 +19,9 @@ let s:result_comment_end = '^-->'
 " Write [lines] to fname and open it in a split
 function! s:SaveLines(lines, fname)
   if writefile(a:lines, a:fname) ==# 0
-    exe 'split '.a:fname
+    if !exists('g:literate_markdown_no_open_tangled_files')
+        exe 'split '.a:fname
+    endif
   else
     echoerr "Could not write to file ".a:fname
   endif
@@ -100,6 +102,9 @@ function! s:GetBlockInterpreter(blockstart)
 
   let interp = s:Lang2Interpreter(lang)
 
+  if empty(interp)
+    let interp = lang
+  endif
   return interp
 endfunction
 
@@ -122,7 +127,6 @@ function! s:ParseTangleDirective(ln)
     endif
     let fname = fnameescape(fname)
   endif
-
   let theinterp = s:Lang2Interpreter(interp[1:-2])
   if empty(theinterp)
     let theinterp = interp[1:-2]
@@ -159,7 +163,7 @@ function! s:AddBlock(interps_files, block, block_start_line, last_set_interp, cu
       " Get the current file for 'all interpreters'
       let curfile = a:curfiles[s:ALL_INTERP]
       let curinterp = s:ALL_INTERP
-    " If the last Tangle directive specified an interpreter
+      " If the last Tangle directive specified an interpreter
     else
       " If the interpreter was specified in a Tangle directive, use its
       " current file
@@ -261,15 +265,15 @@ function! s:ExpandMacro(macros, interp, fname, line)
 endfunction
 
 function! s:GetAllCode()
-
+  
   " The current files set for various interpreters
   let curfiles = {}
-
+  
   " Finalized code, by interpreter and file
   let interps_files = {}
-
+  
   let last_set_interp = s:ALL_INTERP
-
+  
   let macros = {}
 
   let curline = 1
@@ -277,19 +281,19 @@ function! s:GetAllCode()
 
   " Loop through lines
   while curline <=# endline
-
+    
     " If this line has a Tangle directive
     if match(getline(curline), s:tangle_directive) >=# 0
-
+      
       " Try to parse the directive
       let parsedline = s:ParseTangleDirective(curline)
       let [last_set_interp, should_expand_macros, macro_group, curfile] = parsedline
-
+      
       " Process file and interpreter declaration
       if !empty(curfile)
         " Change the current file for the interpreter
         let curfiles[last_set_interp] = curfile
-
+      
         " Process interpreter declaration
         " If the interpreter has already been specified
         if has_key(interps_files, last_set_interp)
@@ -305,31 +309,31 @@ function! s:GetAllCode()
           let interps_files[last_set_interp] = {curfile: []}
         endif
       endif
-
+      
       if !empty(should_expand_macros) || !empty(macro_group)
         if getline(curline+1)->match(s:codeblock_start) ==# -1
           throw "Tangle directive specifies macros on line " .. curline .. " but no code block follows."
         endif
         let block_contents = s:GetBlockContents(curline+1, s:GetBlockEnd(curline+1))
         let block_interp = s:GetBlockInterpreter(curline+1)
-
+      
         if empty(block_interp)
-          throw "Macro expansion defined, but no block language set on line " .. curline+1
+          throw ("Macro expansion defined, but no block language set on line " .. (curline+1))
         endif
-
+      
         " If the last set interpreter was generic, it should override all blocks
         if last_set_interp ==# s:ALL_INTERP
           let block_interp = s:ALL_INTERP
         endif
-
-
+      
+        
         " Process macro expansion
         " Top-level macros
         if !empty(should_expand_macros) && stridx(should_expand_macros, "^") >=# 0
           if !empty(macro_group)
             throw "Top-level macro block on line "  .. curline .. " cannot also belong to macro group."
           endif
-
+        
           if has_key(curfiles, block_interp)
             let curfile = curfiles[block_interp]
           elseif has_key(curfiles, s:ALL_INTERP)
@@ -337,23 +341,23 @@ function! s:GetAllCode()
           else
             throw "No current file set for block on line " .. curline+1
           endif
-
+        
           if !has_key(macros, block_interp)
             let macros[block_interp] = {}
           endif
           if !has_key(macros[block_interp], curfile)
             let macros[block_interp][curfile] = {}
           endif
-
+        
           if has_key(macros[block_interp][curfile], 'toplevel')
             throw "Duplicate top-level macro definition on line " .. curline
           endif
-
+        
           " Add the current block as a top-level macro
           let macros[block_interp][curfile]['toplevel'] = block_contents
           " For regular macro expansion, just add the block
         endif
-
+        
         " Potentially save block as macro
         if !empty(macro_group)
           " If extending an existing macro
@@ -362,14 +366,14 @@ function! s:GetAllCode()
           else
             let to_add = ['']+block_contents
           endif
-
+        
           " If adding to an existing macro
           if stridx(macro_group, "+") ==# len(macro_group)-1
             let macro_tag = macro_group[1:-3]
             if empty(macro_tag)
               throw "Macro tag on line " .. curline .. " cannot be empty"
             endif
-
+        
             if has_key(curfiles, block_interp)
               let curfile = curfiles[block_interp]
             elseif has_key(curfiles, s:ALL_INTERP)
@@ -377,20 +381,20 @@ function! s:GetAllCode()
             else
               throw "No current file set for block on line " .. curline+1
             endif
-
+        
             if !has_key(macros, block_interp)
                   \ || !has_key(macros[block_interp], curfile)
                   \ || !has_key(macros[block_interp][curfile], 'macros')
                   \ || !has_key(macros[block_interp][curfile]['macros'], macro_tag)
               throw "Requested to extend macro <" .. macro_tag .. "> on line " .. curline .. ", but it's not yet defined"
             endif
-
+        
             if type(to_add) ==# v:t_dict
               call add(macros[block_interp][curfile]['macros'][macro_tag], to_add)
             else
               call extend(macros[block_interp][curfile]['macros'][macro_tag], to_add)
             endif
-
+        
           " If defining a new macro
           else
             if has_key(curfiles, block_interp)
@@ -400,23 +404,23 @@ function! s:GetAllCode()
             else
               throw "No current file set for block on line " .. curline+1
             endif
-
+        
             let macro_tag = macro_group[1:-2]
             if empty(macro_tag)
               throw "Macro tag on line " .. curline .. " cannot be empty"
             endif
-
+        
             if !has_key(macros, block_interp)
               let macros[block_interp] = {}
             endif
             if !has_key(macros[block_interp], curfile)
               let macros[block_interp][curfile] = {}
             endif
-
+        
             if has_key(macros[block_interp][curfile], 'macros') && has_key(macros[block_interp][curfile]['macros'], macro_tag)
               throw "Duplicate definition of macro tag <" .. macro_tag .. "> on line " .. curline
             endif
-
+        
             if has_key(macros[block_interp][curfile], 'macros')
               let macros[block_interp][curfile]['macros'][macro_tag] = to_add
             else
@@ -424,33 +428,33 @@ function! s:GetAllCode()
             endif
           endif
         endif
-
+      
         " When processing macros, we process the block also, so move the
         " cursor after it
         let curline += len(block_contents)+2
       endif
-
+    
       " Go to next line
       let curline += 1
     else
       " Find a block on this line
       let block_pos_on_this_line = match(getline(curline), s:codeblock_start)
-
+    
       " If there's a block, process it
       if block_pos_on_this_line >=# 0
-
+        
         " Get the contents of this block
         let block_contents = s:GetBlockContents(curline, s:GetBlockEnd(curline))
-
+        
         if len(block_contents) ==# 0
           throw 'No end of block starting on line '.curline
         endif
-
+        
         let interps_files = s:AddBlock(interps_files, block_contents, curline, last_set_interp, curfiles)
-
+        
         " Skip to after the block
         let curline += len(block_contents)+2
-
+    
       " Otherwise, go to the next line
       else
         let curline += 1
@@ -458,7 +462,11 @@ function! s:GetAllCode()
     endif
   endwhile
 
-
+  
+  if exists('g:literate_markdown_debug')
+    echomsg interps_files
+    echomsg macros
+  endif
   return [interps_files, macros]
 endfunction
 
@@ -504,7 +512,7 @@ function! literate_markdown#Tangle()
 
     " If there's any, tangle it
     if len(lines) ># 0
-
+      
       " Merge lines from all interpreters into the files
       let all_interps_combined = {}
       for fname_and_lines in lines->values()
@@ -517,7 +525,7 @@ function! literate_markdown#Tangle()
         endfor
       endfor
 
-
+      
       " Loop through the filenames and corresponding code
       for [fname, flines] in items(all_interps_combined)
         " Write the code to the respective file
@@ -525,7 +533,9 @@ function! literate_markdown#Tangle()
       endfor
     endif
   catch
-    echoerr v:exception
+    echohl Error
+    echomsg "Error: " .. v:exception .. " (from " .. v:throwpoint .. ")"
+    echohl None
   endtry
 endfunction
 

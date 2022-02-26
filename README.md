@@ -26,3 +26,18 @@ So I wrote this to allow literate programming in Markdown, because in my opinion
 
 You can use your favorite plugin manager (I recommend [vim-plug](https://github.com/junegunn/vim-plug)).
 You can also use Vim's built-in package functionality (`:h packages`).
+
+There are no mappings by default, but the plugin provides `<Plug>` mappings and commands as described in `doc/literate-markdown.txt`.
+
+## Documentation
+There is Vim-based documentation in doc/literate-markdown.txt.
+
+There are also examples in the `examples/` directory.
+
+This plugin itself is written in literate markdown:
+- `examples/literate_markdown_autoload.md`: autoload functions (the bulk of the plugin)
+- `examples/literate_markdown_ftplugin.md`: the interface for the user -- commands and mappings
+
+## Tests
+There are tests in the `tests/` directory.
+Their usage is explained in `tests/README.md`.
