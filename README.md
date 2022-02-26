@@ -18,7 +18,8 @@ For examples of literate programming, see [`examples/`](examples/).
 
 Literate programming is a great way to provide explanation about what you're doing in code.
 It also lets you document what you're doing without the need to follow the exact order of the code, unlike comments embedded in source code.
-You can e.g. layout the overall structure of a program and then jump immediately to some specific computation.
+You can e.g. lay out the overall structure of a program and then jump immediately to some specific computation.
+You can also write code out-of-order where that aids in explanation.
 Emacs handles literate programming quite well in Org mode; I didn't know about anything similar for Vim, particularly for Markdown files.
 So I wrote this to allow literate programming in Markdown, because in my opinion Markdown is a much more universal syntax than Org.
 
