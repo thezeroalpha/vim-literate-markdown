@@ -17,10 +17,10 @@ run_test() {
   # Compare all generated files with expected files
   find "$testdir" -type f -not -name "$1".md | while read -r f;  do
     difference="$(diff "$f" "./${f##*/}")"
-    [ -n "$difference" ] && printf "Test %s FAILED.\nDiff expected vs actual:\n%s" "$1" "$difference"
+    [ -n "$difference" ] && printf "Test %s FAILED.\nDiff expected (%s) vs actual (%s):\n%s" "$1" "$f" "./${f##*/}" "$difference"
   done
 }
 
-for i in all_in_one_file only_specific_language two_different_languages simple_macros; do run_test "$i"; done
+for i in all_in_one_file only_specific_language two_different_languages simple_macros example_1 example_2 example_3; do run_test "$i"; done
 # rm -r "$tempdir"
 trap - INT TERM EXIT
