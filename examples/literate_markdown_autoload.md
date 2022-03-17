@@ -1,6 +1,8 @@
 <!-- :Tangle(vim) ../autoload/literate_markdown.vim -->
 # vim-literate-markdown: autoloaded functions
 This document specifies the functionality of the vim-literate-markdown plugin.
+While in the case of a larger project like this, it is perhaps not ideal and may arguably hinder readability, it serves as a proof-of-concept to showcase the power of this plugin.
+
 Commands and bindings are defined in the [ftplugin](literate_markdown_ftplugin.md).
 
 The general structure of the file is:
@@ -36,7 +38,7 @@ Tangling is when you combine several blocks of code from a literate file into on
 A code block in markdown is delimited by three backticks at the start (followed optionally by the name of a language), and three backticks at the end.
 We'll only tangle code that includes a language, because if there's no language set, the code may not be executable.
 
-Let's define the start and end delimiters as variables containin regular expressions:
+Let's define the start and end delimiters as variables containing regular expressions:
 
 <!-- :Tangle(vim) <constants> -->
 ```vim
@@ -111,6 +113,7 @@ First we take the current line, containing the tangle directive, and split it in
 let parsedline = s:ParseTangleDirective(curline)
 let [last_set_interp, should_expand_macros, macro_group, curfile] = parsedline
 ```
+
 The directive looks like this: `<!-- :Tangle(language) <> <macro name> /path/to/file -->`.
 The language is optional; if it's not specified, the block is tangled into a 'generic' file (specified in `/path/to/file`).
 The diamond (`<>`) is optional, and if it's included, it means that the block contains additional macros that should also be expanded.

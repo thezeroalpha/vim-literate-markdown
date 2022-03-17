@@ -21,6 +21,26 @@ run_test() {
   done
 }
 
+test_block_exec() {
+  die() { printf '%s\n' "$1" >&2 && exit 1; }
+
+  testdir="$tempdir"/exec_block
+  mkdir "$testdir"
+  cp exec_block.md "$testdir"/exec_block.md
+
+  # Run both blocks and check for expected output
+  vim -c 'silent 9 | ExecPrevBlock | $ | ExecPrevBlock | wqall' "$testdir"/exec_block.md
+  [ "$(sed -n 12p "$testdir"/exec_block.md)" = 'Correct!' ] || die "Test exec_block FAILED. Did not find 'Correct!'"
+  grep "^$(whoami).*grep vim" "$testdir"/exec_block.md >/dev/null 2>&1 || die "Test exec_block FAILED. Did not find 'grep vim' in process list"
+
+  # Change the second block & test for expected output
+  vim -c '17norm A | grep -v grep' -c '17 | ExecPrevBlock | wqall' "$testdir"/exec_block.md
+  grep "^$(whoami).*grep vim" "$testdir"/exec_block.md >/dev/null 2>&1 && die "Test exec_block FAILED. Found 'grep vim' in process list when running second time"
+}
+
+test_block_exec
+
 for i in all_in_one_file only_specific_language two_different_languages simple_macros example_1 example_2 example_3; do run_test "$i"; done
-# rm -r "$tempdir"
+
+rm -r "$tempdir"
 trap - INT TERM EXIT
