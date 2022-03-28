@@ -38,9 +38,9 @@ test_block_exec() {
   grep "^$(whoami).*grep vim" "$testdir"/exec_block.md >/dev/null 2>&1 && die "Test exec_block FAILED. Found 'grep vim' in process list when running second time"
 }
 
+# Run the tests
 test_block_exec
-
-for i in all_in_one_file only_specific_language two_different_languages simple_macros example_1 example_2 example_3; do run_test "$i"; done
+for i in all_in_one_file only_specific_language two_different_languages simple_macros example_1 example_2 example_3 indented_tangle_directive; do run_test "$i"; done
 
 rm -r "$tempdir"
 trap - INT TERM EXIT
