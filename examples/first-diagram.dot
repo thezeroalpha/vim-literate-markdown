@@ -1,0 +1,7 @@
+graph t {
+a -- b [label="x"]
+a -- c [label="y"]
+c -- d [label="y"]
+c -- e [label="z"]
+}
+
