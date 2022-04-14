@@ -5,6 +5,12 @@ While in the case of a larger project like this, it is perhaps not ideal and may
 
 Commands and bindings are defined in the [ftplugin](literate_markdown_ftplugin.md).
 
+Todo:
+- shouldn't be able to specify both `<^>` and `<>`
+- shouldn't allow two different top-level `<^>` (I think), unless tangling to different files
+- order in tangle directive should be more or less arbitrary? need to define a grammar.
+- squash whitespace where needed, see tests
+
 The general structure of the file is:
 
 <!-- :Tangle(vim) <^> -->

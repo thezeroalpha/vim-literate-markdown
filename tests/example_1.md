@@ -1,5 +1,5 @@
 # Example 1
-Example 1 from Vim documentation.
+Example 1 from the Vim documentation.
 
 <!-- :Tangle(ruby) DIRNAME/FILENAME.rb -->
 
