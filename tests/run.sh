@@ -40,7 +40,17 @@ test_block_exec() {
 
 # Run the tests
 test_block_exec
-for i in all_in_one_file only_specific_language two_different_languages simple_macros example_1 example_2 example_3 indented_tangle_directive; do run_test "$i"; done
+for i in \
+  all_in_one_file \
+  only_specific_language \
+  two_different_languages \
+  simple_macros \
+  example_1 \
+  example_2 \
+  example_3 \
+  indented_tangle_directive \
+  macro_included_in_two_separate_blocks
+do run_test "$i"; done
 
 rm -r "$tempdir"
 trap - INT TERM EXIT
